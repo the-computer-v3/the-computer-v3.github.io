@@ -206,11 +206,11 @@
             }
         }
 
-        async function triggerPrank(buttonId) {
-            if (buttonId === 'yes') {
+        async function triggerPrank(acceptBtn) {
+            if (acceptBtn === 'yes') {
                 alert("Okay well, take some of this!");
                 for (let i = 0; i < 5; i++) openIdiot();
-            } else if (buttonId === 'no') {
+            } else if (cancelBtn === 'no') {
                 alert("I think you are!");
                 for (let i = 0; i < 3; i++) openIdiot();
             } else {
