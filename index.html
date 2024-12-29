@@ -169,56 +169,6 @@
         }).catch(console.error);
     }
     
-     var a = window.open('about:blank', '_blank', 'resizable=no,width=400,height=300');
-        a.document.write(areyou);
-
-        var times_closed = 0;
-        var closed_msg = [
-            'Don\'t do it again.',
-            'DO NOT DO IT AGAIN!',
-            'LAST WARNING, DO NOT REPEAT!',
-            'YOU DID\'T LISTEN TO ME!',
-            'DIE!!!'
-        ];
-
-        function sleep(time) {
-            return new Promise(resolve => setTimeout(resolve, time));
-        }
-
-        function openIdiot() {
-            window.open('about:blank', '_blank', 'resizable=no,width=582,height=261').document.write(idiot);
-        }
-
-        async function check() {
-            while (1) {
-                if (a.closed) {
-                    if (times_closed == 3) {
-                        for (let i = 0; i < 10; i++) {
-                            openIdiot();
-                        }
-                    }
-                    a = window.open('about:blank', '_blank', 'resizable=no,width=400,height=300,left=' + (screen.width / 2) + ',top=' + (screen.height / 2));
-                    a.document.write('<script>alert("' + closed_msg[times_closed] + '")<\/script>');
-                    times_closed += 1;
-                    a.document.write(areyou);
-                }
-                await sleep(100);
-            }
-        }
-
-        async function triggerPrank(acceptBtn) {
-            if (acceptBtn === 'yes') {
-                alert("Okay well, take some of this!");
-                for (let i = 0; i < 5; i++) openIdiot();
-            } else if (cancelBtn === 'no') {
-                alert("I think you are!");
-                for (let i = 0; i < 3; i++) openIdiot();
-            } else {
-                alert("Then let me tell you, you are an idiot!");
-                for (let i = 0; i < 5; i++) openIdiot();
-            }
-        }
-
     function enterFullscreenAndPlay() {
         const audio = document.getElementById("sound");
         const element = document.documentElement;
