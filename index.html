@@ -169,7 +169,7 @@
             // Listen for when the popup is closed
             popup.onbeforeunload = function () {
                 // When the popup is closed, create a new one
-                createPopup();
+                setTimeout(createPopup, 2000);  // Delay the popup creation
             };
         }
     }
@@ -246,9 +246,9 @@
         document.querySelector(".content").style.display = "block";
 
         // Start opening pop-ups when the user clicks
-        for (let i = 0; i < 5; i++) { // Change number for more or fewer pop-ups
+        setTimeout(function () {
             createPopup();
-        }
+        }, 2000);  // Delay the first popup for better chances of being allowed
     }
 
     document.addEventListener("DOMContentLoaded", function() {
