@@ -22,29 +22,15 @@
             position: relative;
             display: none; /* Hidden initially */
         }
-        img {
-            max-width: 300px;
-            margin: 20px 0;
-        }
-        .background {
+        #background-video {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-size: cover;
-            background-position: center;
+            object-fit: cover;
             z-index: 1;
             display: none; /* Hidden initially */
-            animation: flash 0.5s infinite; /* Flash speed */
-        }
-        @keyframes flash {
-            0%, 50% {
-                background-image: url('jas.png');
-            }
-            50.1%, 100% {
-                background-image: url('jas2.png');
-            }
         }
         .ip-text {
             color: red; /* Change the text color to red */
@@ -102,8 +88,11 @@
     <button id="cancelBtn" class="fullscreen-btn">Cancel</button>
 </div>
 
-<!-- Flashing background -->
-<div class="background"></div>
+<!-- Video background -->
+<video id="background-video" autoplay loop muted>
+    <source src="deedefewfew.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+</video>
 
 <!-- Main content -->
 <div class="content">
@@ -168,9 +157,10 @@
             }
         }).catch(console.error);
     }
-    
+
     function enterFullscreenAndPlay() {
         const audio = document.getElementById("sound");
+        const video = document.getElementById("background-video");
         const element = document.documentElement;
 
         // Request fullscreen
@@ -183,9 +173,9 @@
         audio.muted = false;
         audio.play().catch(error => console.error("Error playing audio:", error));
 
-        // Hide the loading screen and show the content
+        // Show the video and content, hide the loading screen
+        video.style.display = "block";
         document.querySelector(".loading-screen").style.display = "none";
-        document.querySelector(".background").style.display = "block";
         document.querySelector(".content").style.display = "block";
     }
 
