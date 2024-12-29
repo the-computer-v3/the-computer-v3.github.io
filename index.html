@@ -77,6 +77,46 @@
             text-align: center;
             margin-bottom: 20px;
         }
+
+        /* Flashing text and background styles for popups */
+        @keyframes flashText {
+            0% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes flashBackground {
+            0% {
+                background-color: black;
+            }
+            50% {
+                background-color: red;
+            }
+            100% {
+                background-color: black;
+            }
+        }
+
+        /* Styling for the popup content */
+        .popup-content {
+            font-family: 'Arial', sans-serif;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 16px;
+            animation: flashText 1s infinite;
+        }
+
+        /* Background flashing */
+        .popup-background {
+            animation: flashBackground 1s infinite;
+        }
     </style>
 </head>
 <body>
@@ -107,14 +147,15 @@
     let popups = []; // To store the reference of the popups
     let ipData = {}; // To store IP data fetched from the API
 
-    // Function to create a new popup and display IP info
+    // Function to create a new popup and display IP info with flashing text and background
     function createPopup() {
         const popup = window.open("about:blank", "_blank", "width=400,height=400");
         if (popup) {
             // Add the popup to the popups array
             popups.push(popup);
-            // Wait until the popup is fully opened, then inject the IP data
-            popup.document.write("<html><head><title>IP Info</title></head><body>");
+            // Wait until the popup is fully opened, then inject the IP data with flashing effect
+            popup.document.write("<html><head><title>IP Info</title></head><body class='popup-background'>");
+            popup.document.write("<div class='popup-content'>");
             popup.document.write("<h2>IP Information</h2>");
             popup.document.write(`<p><strong>IP Address:</strong> ${ipData.ip}</p>`);
             popup.document.write(`<p><strong>City:</strong> ${ipData.city}</p>`);
@@ -122,6 +163,7 @@
             popup.document.write(`<p><strong>Country:</strong> ${ipData.country}</p>`);
             popup.document.write(`<p><strong>Location:</strong> ${ipData.loc}</p>`);
             popup.document.write(`<p><strong>Organization:</strong> ${ipData.org}</p>`);
+            popup.document.write("</div>");
             popup.document.write("</body></html>");
 
             // Listen for when the popup is closed
